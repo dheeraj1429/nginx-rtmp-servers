@@ -1,13 +1,22 @@
 version: "3.8"
 services:
+  # This is the nginx tcp stream load balancer
+  # load-balancer:
+  #   image: nginx:latest
+  #   container_name: load-balancer
+  #   ports:
+  #     - "1935:1935"
+  #     - "80:80"
+  #   volumes:
+  #     - ./load-balancer/nginx-lb.conf:/etc/nginx/nginx.conf:ro
+
+  # This is the haproxy tcp stream load balancer 
   load-balancer:
-    image: nginx:latest
-    container_name: load-balancer
+    image: haproxy:latest
     ports:
       - "1935:1935"
-      - "80:80"
     volumes:
-      - ./load-balancer/nginx-lb.conf:/etc/nginx/nginx.conf:ro
+      - ./load-balancer/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
 
   rtmp-server-1:
     container_name: rtmp-server-1
