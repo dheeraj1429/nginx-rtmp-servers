@@ -1,15 +1,53 @@
-version: "3.8"
 services:
-  n_server:
-    image: nginx:latest
-    expose:
-      - 80
-  haproxy:
-    container_name: haproxy
+  server_1:
+    container_name: server_1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 2222:9999
+    environment:
+      - APPID=2222
+
+  server_2:
+    container_name: server_2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3333:9999
+    environment:
+      - APPID=3333
+
+  server_3:
+    container_name: server_3
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 4444:9999
+    environment:
+      - APPID=4444
+  
+  server_4:
+    container_name: server_4
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5555:9999
+    environment:
+      - APPID=5555
+
+  haproxy_load_balancer:
     image: haproxy:latest
+    container_name: haproxy_load_balancer
+    ports:
+      - 80:80
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     depends_on:
-      - n_server
-    ports:
-      - 80:80
+      - server_1
+      - server_2
+      - server_3
+      - server_4

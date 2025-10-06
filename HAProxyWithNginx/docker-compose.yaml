@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  n_server:
+    image: nginx:latest
+    expose:
+      - 80
+  haproxy:
+    container_name: haproxy
+    image: haproxy:latest
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - n_server
+    ports:
+      - 80:80
