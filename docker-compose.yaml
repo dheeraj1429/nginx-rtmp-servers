@@ -1,3 +1,5 @@
+# https://docs.google.com/document/d/1EnXzhhr-q0kDHP7zrBSafOOQDxE6gAMvI02Rr3agtp8/edit?usp=sharing
+
 version: "3.8"
 services:
   # Nginx, when used as a TCP load balancer (stream module), behaves differently from HTTP mode.
