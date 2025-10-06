@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  load-balancer:
+    image: nginx:latest
+    container_name: load-balancer
+    ports:
+      - "1935:1935"
+      - "80:80"
+    volumes:
+      - ./load-balancer/nginx-lb.conf:/etc/nginx/nginx.conf:ro
+
+  rtmp-server-1:
+    container_name: rtmp-server-1
+    build:
+      context: ./rtmp
+      dockerfile: Dockerfile
+    expose:
+      - 1935
+  
+  rtmp-server-2:
+    container_name: rtmp-server-2
+    build:
+      context: ./rtmp
+      dockerfile: Dockerfile
+    expose:
+      - 1935
+  
+
+  rtmp-server-3:
+    container_name: rtmp-server-3
+    build:
+      context: ./rtmp
+      dockerfile: Dockerfile
+    expose:
+      - 1935
+  
