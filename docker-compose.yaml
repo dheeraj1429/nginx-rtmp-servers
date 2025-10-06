@@ -1,6 +1,22 @@
 version: "3.8"
 services:
-  # This is the nginx tcp stream load balancer
+  # Nginx, when used as a TCP load balancer (stream module), behaves differently from HTTP mode.
+  # Persistent TCP connections, When a client (like OBS or FFmpeg) connects to Nginx for RTMP streaming, it creates a persistent TCP connection.
+  # Nginx uses consistent hashing or a single connection for that client, 
+  # meaning: The same source IP will always be routed to the same backend unless configured otherwise.
+  # So — if all your test streams come from the same IP (like 127.0.0.1 or your local machine),
+  # 👉 Nginx keeps routing them to the same backend (first upstream backend server).
+  # When the backend RTMP server dies:
+  # 1. Existing TCP session dies immediately
+  # Nginx’s stream proxy works like a TCP tunnel — it just passes bytes between client and backend.
+  # If the backend closes or drops the connection:
+  # Nginx immediately closes the connection with the client.
+  # The OBS (or streaming client) will show “Connection lost” or “Failed to publish stream”.
+  # Nginx does NOT retry or re-route that existing stream to another backend.
+  # New connections still work fine
+  # Nginx continues to health check or skip dead servers.
+  # Future connection attempts (new streams) will get routed to a healthy backend.
+
   # load-balancer:
   #   image: nginx:latest
   #   container_name: load-balancer
@@ -10,7 +26,13 @@ services:
   #   volumes:
   #     - ./load-balancer/nginx-lb.conf:/etc/nginx/nginx.conf:ro
 
-  # This is the haproxy tcp stream load balancer 
+  # It detects backend failure very fast
+  # HAProxy continuously performs health checks (like TCP pings or RTMP port checks).
+  # If a backend goes down, it marks it as DOWN immediately.
+  # For existing streams:
+  # If the TCP connection between HAProxy and the backend dies, HAProxy will send the tcp packages to another backend tcp server for example:
+  # We have 3 backend container which handling the live stream and container 1 dies then haproxy will not close the client connection it will
+  # redirect new tcp/live stream packets to other backend servers such as container 2 or container 3.
   load-balancer:
     image: haproxy:latest
     ports:
